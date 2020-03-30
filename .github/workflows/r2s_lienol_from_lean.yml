@@ -92,7 +92,10 @@ jobs:
           cd friendlywrt
           git config --local user.email "action@github.com" && git config --local user.name "GitHub Action"
           git remote add upstream https://github.com/Lienol/openwrt && git fetch upstream
-          git rebase adc1a9a3676b8d7be1b48b5aed185a94d8e42728^ --onto upstream/dev-lean-lede -X theirs
+          git checkout upstream/dev-lean-lede -b tmp
+          git mv README.md README && git commit -m 'undo rename readme for rebasing'
+          git checkout origin/master-v19.07.1
+          git rebase adc1a9a3676b8d7be1b48b5aed185a94d8e42728^ --onto tmp -X theirs
           git revert --no-edit f092ca098e80c667b10cdd1dba328506a2673c1d
           git checkout upstream/dev-lean-lede -- feeds.conf.default
           cd package/lean/
@@ -106,7 +109,7 @@ jobs:
           sed -i '/exit/i\find /etc/rc.d/ -name *docker* -delete' package/lean/default-settings/files/zzz-default-settings
           sed -i 's/option fullcone\t1/option fullcone\t0/' package/network/config/firewall/files/firewall.config
           sed -i '/8.8.8.8/d' package/base-files/files/root/setup.sh
-          mv ../../scripts/check_wan4.sh package/base-files/files/usr/bin && mv ../../scripts/check_wan4 package/base-files/files/etc/init.d && cd package/base-files/files/etc/rc.d && ln -s ../init.d/check_wan4 S95check_wan4 && cd ../../../../../
+          mv ../../scripts/check_wan4.sh package/base-files/files/usr/bin && sed -i '/exit/i\/bin/sh /usr/bin/check_wan4.sh &' package/base-files/files/etc/rc.local
           echo -e '\nDYC Build\n' >> package/base-files/files/etc/banner
           
       - name: Build FriendlyWrt

@@ -1,14 +1,10 @@
 #!/bin/sh
 
-source /lib/functions/network.sh
-network_find_wan NET_IF
-network_get_gateway NET_GW "${NET_IF}"
-
-r=`ping -c1 "${NET_GW}"`
-r=`echo $r | grep Permitted`
 while true; do
-    if [[ "$r" != "" ]] ;then
-        /etc/init.d/firewall restart
-    fi
+    wan=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+    r=`ping -c1 $wan 2>&1`
+    case $r in
+        *permitted* ) /etc/init.d/firewall reload ;;
+    esac
     sleep 2
 done
