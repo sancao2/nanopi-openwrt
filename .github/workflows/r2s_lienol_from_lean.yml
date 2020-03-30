@@ -1,4 +1,4 @@
-name: r2s Lienol版openwrt based on Lean1
+name: r2s Lienol版openwrt based on Lean
 
 on:
   push:
